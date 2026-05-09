@@ -21,45 +21,69 @@ export default function LoginPage() {
     }
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow w-96">
-        
-        <h1 className="text-2xl font-bold text-center mb-6">
-          🗳️ Vote Asso
-        </h1>
+  // Au début de ton composant (avec les autres useState)
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          
+  return (
+    <div className="container">
+      <div className="card">
+        <h2 className="title">Connexion</h2>
+
+        <form onSubmit={handleLogin}>
+
+          {/* Champ Email */}
+          <label htmlFor="email" className="label">
+            Adresse email
+          </label>
           <input
+            id="email"
             type="email"
-            placeholder="Ton email"
+            placeholder="votre@email.com"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className="border rounded-lg p-3"
+            className="input"
             required
           />
-          
+
+          {/* Champ Mot de passe */}
+          <label htmlFor="password" className="label">
+            Mot de passe
+          </label>
           <input
-            type="password"
-            placeholder="Ton mot de passe"
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className="border rounded-lg p-3"
+            className="input"
             required
           />
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {/* Message d'erreur */}
+          {error && (
+            <div className="error">
+              {error}
+            </div>
+          )}
 
+          {/* Bouton de connexion */}
           <button
             type="submit"
-            className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium"
+            disabled={isLoading}
+            className="btn"
           >
-            Se connecter
+            {isLoading ? 'Connexion en cours...' : 'Se connecter'}
           </button>
 
         </form>
       </div>
     </div>
   )
+
+
+
+
+
+
 }

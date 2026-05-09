@@ -1,38 +1,186 @@
-@import "tailwindcss";
+/**
+ * Global CSS - App de vote
+ * Thème sombre, simple et réutilisable
+ */
 
 :root {
-  --background: #1d2323;
-  --foreground: #171717;
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --accent: #3da9e7;
+  --accent-hover: #6ac3cf;
+  --error: #ef4444;
+  --success: #22c55e;
+  --border: 1px solid #374151;
+  --radius: 0.5rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #48585e;
-    --foreground: #cedbe9;
-  }
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
 }
 
+/* Layout */
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
 
-.btn-vote {
-  padding: 12px 24px;
-  background-color: #22c55e;
-  color: white;
+/* Card */
+.card {
+  background-color: var(--bg-secondary);
+  border: var(--border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Typographie */
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Inputs */
+.input {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  background-color: var(--bg-primary);
+  border: var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Boutons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.5rem;
   border: none;
-  border-radius: 20px;
-  font-size: 16px;
-  font-weight: bold;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  width: 100%;
 }
+
+.btn-primary {
+  background-color: var(--accent);
+  color: white;
+  border-radius: var(--radius);
+  font-size: large;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: var(--border);
+}
+
+.btn-secondary:hover {
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Messages */
+.error {
+  padding: 0.65rem 1rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--error);
+  border-radius: var(--radius);
+  color: var(--error);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.success {
+  padding: 0.65rem 1rem;
+  background-color: rgba(34, 197, 94, 0.1);
+  border: 1px solid var(--success);
+  border-radius: var(--radius);
+  color: var(--success);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+/* Lien */
+.link {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Divider */
+.divider {
+  border: none;
+  border-top: var(--border);
+  margin: 1.5rem 0;
+}
+
+/* Utilitaires */
+.text-center { text-align: center; }
+.text-muted   { color: var(--text-secondary); font-size: 0.875rem; }
+.mt-1         { margin-top: 0.5rem; }
+.mt-2         { margin-top: 1rem; }
+.mt-3         { margin-top: 1.5rem; }
