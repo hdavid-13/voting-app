@@ -30,24 +30,33 @@ function pct(value: number, total: number) {
 export default function DashboardClient({ initial }: { initial: Proposal[] }) {
   const [proposals, setProposals] = useState<Proposal[]>(initial)
 
-  useEffect(() => {
-    // S'abonner aux changements sur proposals
+    useEffect(() => {
     const channel = supabase
-      .channel('dashboard')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'proposals' }, () => {
-        // Refetch toutes les proposals
-        supabase
-          .from('proposals')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .then(({ data }) => {
-            if (data) setProposals(data)
-          })
-      })
-      .subscribe()
+        .channel('dashboard')
+        .on(
+        'postgres_changes',
+        {
+            event: '*',
+            schema: 'public',
+            table: 'proposals',
+            // 👇 Écoute uniquement les colonnes de votes
+            filter: 'yes_count,no_count,abstain_count,status',
+        },
+        () => {
+            supabase
+            .from('proposals')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .then(({ data }) => {
+                if (data) setProposals(data)
+            })
+        }
+        )
+        .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [])
+    }, [])
+
 
   const total = proposals.length
   const open = proposals.filter((p) => p.status === 'OPEN').length
