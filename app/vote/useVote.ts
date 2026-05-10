@@ -29,7 +29,7 @@ export function useVote() {
   async function fetchVotedProposals(uid: string) {
     const { data } = await supabase
       .from('votes')
-      .select('proposal_id')
+      .select('proposal_id, choice')
       .eq('user_id', uid)
 
     if (data) {
