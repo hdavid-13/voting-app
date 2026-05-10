@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 
 export default function Navbar() {
   const pathname = usePathname()
-  const showNavbar = pathname !== '/login'
+  const showNavbar = pathname !== '/login' && pathname !== '/set-password' && pathname !== '/'
 
   if (!showNavbar) return null
   const router = useRouter()
