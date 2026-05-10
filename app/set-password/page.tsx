@@ -13,26 +13,20 @@ export default function SetPasswordPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get('code')
-    
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
-        if (data.session) {
-          setReady(true)
-        } else {
-          setError('Lien invalide ou expiré : ' + error?.message)
-        }
-      })
-    } else {
-      // Fallback : peut-être déjà une session active
-      supabase.auth.getSession().then(({ data }) => {
-        if (data.session) {
-          setReady(true)
-        } else {
-          setError('Lien invalide ou expiré')
-        }
-      })
-    }
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        setReady(true)
+        return
+      }
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setReady(true)
+      }
+    })
+
+    return () => listener.subscription.unsubscribe()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,7 +64,7 @@ export default function SetPasswordPage() {
         <p className="subtitle text-center">Définis ton mot de passe</p>
 
         {!ready ? (
-          <p className="subtitle text-center">Chargement...</p>
+          <p className="subtitle text-center">// Chargement...</p>
         ) : (
           <form onSubmit={handleSubmit}>
             <label className="label">Mot de passe</label>
@@ -96,7 +90,7 @@ export default function SetPasswordPage() {
             {error && <p className="error">{error}</p>}
 
             <button type="submit" className="btn" disabled={loading}>
-              {loading ? 'Chargement...' : 'Confirmer'}
+              {loading ? '// Chargement...' : '> Confirmer'}
             </button>
           </form>
         )}
