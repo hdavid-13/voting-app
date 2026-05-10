@@ -20,6 +20,7 @@ export function useVote() {
 
   async function fetchUser() {
     const { data } = await supabase.auth.getUser()
+    console.log("SUR AKASH - USER ID:", data.user?.id) 
     const uid = data.user?.id ?? null
     setUserId(uid)
     if (uid) fetchVotedProposals(uid)
