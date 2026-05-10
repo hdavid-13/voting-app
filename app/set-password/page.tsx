@@ -13,20 +13,31 @@ export default function SetPasswordPage() {
   const router = useRouter()
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        setReady(true)
-        return
-      }
-    })
+    const hash = window.location.hash
 
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        setReady(true)
-      }
-    })
+    if (hash && hash.includes('access_token')) {
+      const params = new URLSearchParams(hash.substring(1))
+      const access_token = params.get('access_token')
+      const refresh_token = params.get('refresh_token')
 
-    return () => listener.subscription.unsubscribe()
+      if (access_token && refresh_token) {
+        supabase.auth.setSession({ access_token, refresh_token }).then(({ data, error }) => {
+          if (data.session) {
+            setReady(true)
+          } else {
+            setError('Lien invalide ou expiré : ' + error?.message)
+          }
+        })
+      }
+    } else {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session) {
+          setReady(true)
+        } else {
+          setError('Lien invalide ou expiré')
+        }
+      })
+    }
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,6 +105,8 @@ export default function SetPasswordPage() {
             </button>
           </form>
         )}
+
+        {error && !ready && <p className="error text-center">{error}</p>}
       </div>
     </div>
   )
