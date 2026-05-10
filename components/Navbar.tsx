@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation'
 
 export default function Navbar() {
   const pathname = usePathname()
+  const showNavbar = pathname !== '/login'
+
+  if (!showNavbar) return null
   const router = useRouter()
 
   const handleLogout = async () => {
