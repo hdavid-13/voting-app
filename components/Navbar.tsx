@@ -19,6 +19,7 @@ export default function Navbar() {
   const links = [
     { href: '/vote', label: 'votes' },
     { href: '/dashboard', label: 'dashboard' },
+    { href: '/docs', label: 'docs' },
   ]
 
   return (
