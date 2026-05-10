@@ -46,7 +46,7 @@ export default function VotePage() {
         {handleLogout && (
           <button
             onClick={handleLogout}
-            style={{ backgroundColor: 'rgba(255, 104, 126, 0.8)' }}
+            style={{ backgroundColor: 'rgba(118, 87, 255, 0.8)' }}
             className="btn-primary"
           >
             Se déconnecter
