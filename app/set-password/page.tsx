@@ -13,20 +13,26 @@ export default function SetPasswordPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Supabase lit automatiquement le hash de l'URL et crée la session
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        setReady(true)
-      } else {
-        // Attendre que Supabase traite le hash
-        const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-          if (session) {
-            setReady(true)
-            listener.subscription.unsubscribe()
-          }
-        })
-      }
-    })
+    const code = new URLSearchParams(window.location.search).get('code')
+    
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+        if (data.session) {
+          setReady(true)
+        } else {
+          setError('Lien invalide ou expiré : ' + error?.message)
+        }
+      })
+    } else {
+      // Fallback : peut-être déjà une session active
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session) {
+          setReady(true)
+        } else {
+          setError('Lien invalide ou expiré')
+        }
+      })
+    }
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
