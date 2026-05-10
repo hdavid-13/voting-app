@@ -1,19 +1,20 @@
 /**
  * Global CSS - App de vote
- * Thème sombre, simple et réutilisable
+ * Thème terminal OM
  */
 
 :root {
-  --bg-primary: #111827;
-  --bg-secondary: #1f2937;
-  --text-primary: #f9fafb;
-  --text-secondary: #9ca3af;
-  --accent: #3da9e7;
-  --accent-hover: #6ac3cf;
-  --error: #ef4444;
-  --success: #22c55e;
-  --border: 1px solid #374151;
-  --radius: 0.5rem;
+  --bg-primary: #0c1010;
+  --bg-secondary: #000000;
+  --text-primary: #cce8f0;
+  --text-secondary: #4a7a8a;
+  --accent: #00b4d8;
+  --accent-hover: #0096b4;
+  --gold: #c9a84c;
+  --error: #e05555;
+  --success: #00b4d8;
+  --border: 1px solid #162030;
+  --radius: 0;
 }
 
 /* Reset */
@@ -24,12 +25,13 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.5;
   min-height: 100vh;
 }
+
 
 /* Layout */
 .container {
@@ -42,7 +44,7 @@ body {
 .card {
   background-color: var(--bg-secondary);
   border: var(--border);
-  border-radius: 0.75rem;
+  border-top: 1px solid var(--accent);
   padding: 1.5rem;
   margin-bottom: 1rem;
 }
@@ -50,41 +52,61 @@ body {
 /* Typographie */
 .title {
   font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 300;
   margin-bottom: 0.5rem;
+  color: var(--accent);
+}
+
+.title::before {
+  content: '> ';
+  color: var(--gold);
 }
 
 .subtitle {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
   margin-bottom: 1.5rem;
 }
 
+.subtitle::before {
+  content: '// ';
+  color: var(--gold);
+  opacity: 0.6;
+}
+
 .label {
   display: block;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   margin-bottom: 0.4rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.label::before {
+  content: '$ ';
+  color: var(--gold);
 }
 
 /* Inputs */
 .input {
   width: 100%;
   padding: 0.65rem 1rem;
-  background-color: var(--bg-primary);
+  background-color: rgba(0, 0, 0, 0.4);
   border: var(--border);
-  border-radius: var(--radius);
+  border-left: 2px solid var(--accent);
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
   margin-bottom: 1rem;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
 }
 
 .input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 10px rgba(0, 180, 216, 0.1);
 }
 
 .input::placeholder {
@@ -98,25 +120,31 @@ body {
   justify-content: center;
   padding: 0.65rem 1.5rem;
   border: none;
-  border-radius: var(--radius);
   font-size: 1rem;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.2s;
   width: 100%;
+  letter-spacing: 0.05em;
 }
 
 .btn-primary {
-  background-color: var(--accent);
-  color: white;
-  border-radius: var(--radius);
-  font-size: large;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+}
+
+.btn-primary::before {
+  content: '> ';
+  color: var(--gold);
 }
 
 .btn-primary:hover {
-  background-color: var(--accent-hover);
+  background-color: rgba(0, 180, 216, 0.08);
+  box-shadow: 0 0 16px rgba(0, 180, 216, 0.15);
 }
 
 .btn-secondary {
@@ -127,7 +155,7 @@ body {
 
 .btn-secondary:hover {
   color: var(--text-primary);
-  border-color: var(--text-primary);
+  border-color: var(--text-secondary);
 }
 
 .btn:active {
@@ -135,7 +163,7 @@ body {
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
   cursor: not-allowed;
   transform: none;
 }
@@ -143,32 +171,44 @@ body {
 /* Messages */
 .error {
   padding: 0.65rem 1rem;
-  background-color: rgba(239, 68, 68, 0.1);
-  border: 1px solid var(--error);
-  border-radius: var(--radius);
+  background-color: rgba(224, 85, 85, 0.05);
+  border: var(--border);
+  border-left: 2px solid var(--error);
   color: var(--error);
   font-size: 0.875rem;
   margin-bottom: 1rem;
 }
 
+.error::before {
+  content: '[ERR] ';
+  font-weight: 700;
+}
+
 .success {
   padding: 0.65rem 1rem;
-  background-color: rgba(34, 197, 94, 0.1);
-  border: 1px solid var(--success);
-  border-radius: var(--radius);
-  color: var(--success);
+  background-color: rgba(0, 180, 216, 0.05);
+  border: var(--border);
+  border-left: 2px solid var(--accent);
+  color: var(--accent);
   font-size: 0.875rem;
   margin-bottom: 1rem;
 }
 
+.success::before {
+  content: '[OK] ';
+  color: var(--gold);
+  font-weight: 700;
+}
+
 /* Lien */
 .link {
-  color: var(--accent);
+  color: var(--gold);
   text-decoration: none;
+  transition: all 0.2s;
 }
 
 .link:hover {
-  text-decoration: underline;
+  color: var(--accent);
 }
 
 /* Divider */

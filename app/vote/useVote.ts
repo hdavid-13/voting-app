@@ -1,90 +1,151 @@
-'use client'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { Choice, Proposal, Selections } from './types'
 
-export function useVote() {
-  const [proposals, setProposals] = useState<Proposal[]>([])
-  const [userId, setUserId] = useState<string | null>(null)
+type Choice = 'YES' | 'NO' | 'ABSTAIN'
+type Selections = Record<string, Choice>
+
+export function useVote(proposals: any[]) {
   const [selections, setSelections] = useState<Selections>({})
+  const [votedProposals, setVotedProposals] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [votedProposals, setVotedProposals] = useState<Set<string>>(new Set())
-  const router = useRouter()
 
   useEffect(() => {
-    fetchUser()
-    fetchProposals()
-  }, [])
+    if (proposals.length === 0) return
+    init()
+  }, [proposals])
 
-  async function fetchUser() {
-    const { data } = await supabase.auth.getUser()
-    console.log("SUR AKASH - USER ID:", data.user?.id) 
-    const uid = data.user?.id ?? null
-    setUserId(uid)
-    if (uid) fetchVotedProposals(uid)
-  }
-
-  async function fetchVotedProposals(uid: string) {
-    const { data } = await supabase
-      .from('votes')
-      .select('proposal_id, choice')
-      .eq('user_id', uid)
-
-    if (data) {
-      setVotedProposals(new Set(data.map((v) => v.proposal_id)))
-    }
-  }
-
-  async function fetchProposals() {
+  async function init() {
     setLoading(true)
-    const { data, error } = await supabase.from('proposals').select('*')
-    if (error) setError('Erreur lors du chargement des propositions')
-    setProposals(data || [])
+    const { data: userData } = await supabase.auth.getUser()
+    const uid = userData.user?.id
+    if (!uid) {
+      setError('Non connecté')
+      setLoading(false)
+      return
+    }
+    await fetchVotedProposals(uid)
     setLoading(false)
   }
 
+  async function fetchVotedProposals(uid: string) {
+    const publicIds = proposals.filter(p => p.method === 'PUBLIC').map(p => p.id)
+    const secretIds = proposals.filter(p => p.method === 'SECRET').map(p => p.id)
+
+    const voted = new Set<string>()
+    const s: Selections = {}
+
+    if (publicIds.length > 0) {
+      const { data } = await supabase
+        .from('votes')
+        .select('proposal_id, choice')
+        .eq('user_id', uid)
+        .in('proposal_id', publicIds)
+
+      data?.forEach(v => {
+        voted.add(v.proposal_id)
+        s[v.proposal_id] = v.choice
+      })
+    }
+
+    if (secretIds.length > 0) {
+      const { data } = await supabase
+        .from('vote_receipts')
+        .select('proposal_id')
+        .eq('user_id', uid)
+        .in('proposal_id', secretIds)
+
+      data?.forEach(v => voted.add(v.proposal_id))
+    }
+
+    setVotedProposals(voted)
+    setSelections(s)
+  }
+
   function select(proposalId: string, choice: Choice) {
-    setSelections((prev) => ({ ...prev, [proposalId]: choice }))
+    if (votedProposals.has(proposalId)) return
+    setSelections(prev => ({ ...prev, [proposalId]: choice }))
   }
 
   async function confirm(proposalId: string) {
-    const { data } = await supabase.auth.getUser()
-    console.log('USER AU MOMENT DU VOTE:', data.user)
-
     const choice = selections[proposalId]
-    if (!choice) return alert('Choisis une option')
-    if (!userId) return alert('Connecte-toi pour voter')
+    if (!choice) return
 
-    const { error } = await supabase
-      .from('votes')
-      .insert({ proposal_id: proposalId, user_id: userId, choice })
+    const { data: userData } = await supabase.auth.getUser()
+    const uid = userData.user?.id
+    if (!uid) return
 
-    if (error) {
-      console.log('ERREUR VOTE:', error)
-      setError('Erreur lors du vote. Tu as peut-être déjà voté.')
-      return
+    const proposal = proposals.find(p => p.id === proposalId)
+    if (!proposal) return
+
+    if (proposal.method === 'SECRET') {
+      // Vote anonyme
+      const { error: voteError } = await supabase
+        .from('anonymous_votes')
+        .insert({ proposal_id: proposalId, choice })
+
+      if (voteError) {
+        setError('Erreur lors du vote')
+        console.error("Erreur insertion vote anonyme:", voteError)
+        return
+      }
+
+      // Reçu de vote
+      const { error: receiptError } = await supabase
+        .from('vote_receipts')
+        .insert({ proposal_id: proposalId, user_id: uid })
+
+      if (receiptError) {
+        setError("Erreur lors de l'enregistrement du reçu")
+        console.error("Erreur insertion reçu:", receiptError)
+        return
+      }
+
+      // 👇 Appel RPC pour les votes SECRET
+      const { error: rpcError } = await supabase.rpc('update_proposal_counter', {
+        proposal_id: proposalId,
+        choice
+      })
+
+      if (rpcError) {
+        setError('Erreur lors de la mise à jour des compteurs')
+        console.error("Erreur RPC SECRET:", rpcError)
+        return
+      }
+
+    } else {
+      // Vote PUBLIC
+      const { error: voteError } = await supabase
+        .from('votes')
+        .insert({ proposal_id: proposalId, user_id: uid, choice })
+        .select()
+
+      if (voteError) {
+        setError('Erreur lors du vote')
+        console.error("Erreur insertion vote public:", voteError)
+        return
+      }
+
+      // 👇 Appel RPC pour les votes PUBLIC (c'était manquant !)
+      const { error: rpcError } = await supabase.rpc('update_proposal_counter', {
+        proposal_id: proposalId,
+        choice
+      })
+
+      if (rpcError) {
+        setError('Erreur lors de la mise à jour des compteurs')
+        console.error("Erreur RPC PUBLIC:", rpcError)
+        return
+      }
     }
 
-    setVotedProposals((prev) => new Set(prev).add(proposalId))
-    fetchProposals()
+    setVotedProposals(prev => new Set([...prev, proposalId]))
   }
 
   async function handleLogout() {
     await supabase.auth.signOut()
-    router.push('/')
+    window.location.href = '/login'
   }
 
-  return {
-    proposals,
-    userId,
-    selections,
-    loading,
-    error,
-    votedProposals,
-    select,
-    confirm,
-    handleLogout,
-  }
+  return { selections, votedProposals, loading, error, select, confirm, handleLogout }
 }
