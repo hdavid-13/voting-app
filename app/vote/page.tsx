@@ -19,7 +19,9 @@ export default function VotePage() {
 
       {error && <p style={{ color: 'red', marginBottom: '16px' }}>{error}</p>}
 
-      {proposals.map((p) => {
+      {proposals
+        .filter((p) => p.status !== 'CLOSED')
+        .map((p) => {
         const isAnon = p.method === 'SECRET'
         const { selections, votedProposals, select, confirm } = auth
 
