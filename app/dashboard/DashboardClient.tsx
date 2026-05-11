@@ -115,7 +115,10 @@ export default function DashboardClient({ initial }: { initial: Proposal[] }) {
             <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0.25rem 0 0.5rem' }}>
               // créé le {formatDate(p.created_at)}
             </p>
-            <p className="subtitle">{p.description}</p>
+            <p 
+              className="subtitle"
+              style={{ whiteSpace: 'pre-line' }}
+            >{p.description}</p>
 
             <div style={{ marginTop: '1rem' }}>
               <div style={{ display: 'flex', height: '6px', borderRadius: '2px', overflow: 'hidden', background: '#1e2a38' }}>
