@@ -26,7 +26,10 @@ export default function VotePage() {
         return (
           <div key={p.id} className="card">
             <h2 className="title">{p.title}</h2>
-            <p className="subtitle">{p.description}</p>
+            <p 
+              className="subtitle"
+              style={{ whiteSpace: 'pre-line'}}      
+            >{p.description}</p>
             <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
               {isAnon ? '// vote anonyme' : '// vote public'}
             </p>
