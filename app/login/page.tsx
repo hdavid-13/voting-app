@@ -25,7 +25,7 @@ export default function LoginPage() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
 
-        <h1 className="title text-center">Vote J42 Marseille</h1>
+        <h1 className="title text-center">Vote 42 Marseille</h1>
         <p className="subtitle text-center">Connecte-toi pour voter</p>
 
         <form onSubmit={handleLogin}>
